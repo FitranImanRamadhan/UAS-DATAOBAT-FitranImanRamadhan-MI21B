@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Obat</title>
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: aquamarine;
+        }
+
+        header {
+            background-color: rgb(61, 149, 119);
+            padding: 10px;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+        }
+
+
+        .container {
+            margin-top: 20px;
+            border: 1px solid #000;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        table {
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            text-align: center;
+        }
+
+        .edit,
+        .delete {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .edit {
+            background-color: #ffc107;
+            color: #000;
+            border: none;
+        }
+
+        .delete {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+        }
+
+        .edit:hover,
+        .delete:hover {
+            opacity: 0.8;
+        }
+
+        .marquee {
+            background-color: aliceblue;
+            padding-top: 2px;
+            padding-bottom: 2px;
+        }
+
+        .footer {
+            background-color: rgb(61, 149, 119);
+            color: white;
+            margin-top: 10px;
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Data Obat</h1>
+    </header>
+    <marquee class="marquee bg-primary-subtle" behavior="scroll" direction="left">Selamat Datang || Fitran Iman Ramadhan
+        || MI21B</marquee>
+    <div class="container">
+        <div class="kln">
+            <h3 class="text-bold">Berikut adalah daftar obat :</h3>
+            <div class="mb-3 mt-4">
+                <label for="nama_obat" class="form-label">Nama Obat</label>
+                <input id="nama_obat" type="text" class="form-control" placeholder="Isi nama obat disini">
+
+                <label for="jenis_obat" class="form-label mt-3">Jenis Obat</label>
+                <input id="jenis_obat" type="text" class="form-control" placeholder="Isi jenis obat disini">
+
+                <label for="produsen" class="form-label mt-3">Produsen</label>
+                <input id="produsen" type="text" class="form-control" placeholder="Isi produsen disini">
+
+                <label for="harga" class="form-label mt-3">Harga</label>
+                <input id="harga" type="number" class="form-control" placeholder="Isi harga disini">
+
+                <label for="stok" class="form-label mt-3">Stok</label>
+                <input id="stok" type="number" class="form-control" placeholder="Isi stok disini">
+
+                <div class="d-grid gap-2">
+                    <button class="btn btn-success mt-2" id="button" onclick="saveData()">Simpan</button>
+                </div>
+            </div>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="bg-info">No</th>
+                        <th class="bg-info">Nama Obat</th>
+                        <th class="bg-info">Jenis Obat</th>
+                        <th class="bg-info">Produsen</th>
+                        <th class="bg-info">Harga</th>
+                        <th class="bg-info">Stok</th>
+                        <th colspan="2" class="bg-info">Action</th </tr>
+                </thead>
+                <tbody id="medicines"></tbody>
+            </table>
+        </div>
+    </div>
+    <footer>
+        <div class="footer">
+            <p class="text-center">&copy; 2023 Fitran Iman Ramadhan. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Axios Library -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+
+
+        //TAMPIL DATA
+        const getMedicine = async () => {
+            await axios.get(`http://103.163.110.11:3031/medicines`)
+                .then((response) => {
+                    let bucket = ``;
+                    let medicines = response.data;
+                    console.log(medicines)
+                    if (medicines.length > 0) {
+                        for (let i = 0; i < medicines.length; i++) {
+                            bucket += `
+                            <tr>
+                            <td>${i + 1}</td>
+                            <td>${medicines[i].nama_obat}</td>
+                            <td>${medicines[i].jenis_obat}</td>
+                            <td>${medicines[i].produsen}</td>
+                            <td>${medicines[i].harga}</td>
+                            <td>${medicines[i].stok}</td>
+                            <td>
+                                <button class="edit" onclick="editData('${medicines[i].id}', '${medicines[i].nama_obat}', '${medicines[i].jenis_obat}', '${medicines[i].produsen}', '${medicines[i].harga}',
+                                 '${medicines[i].stok}')">Edit</button>
+                                </td>
+                            <td>
+                                <button class="delete" onclick="deleteData(${medicines[i].id})">Delete</button>
+                                </td>
+                            </tr>
+                            `
+                        }
+                    } else {
+                        bucket += `
+                            <tr>
+                            <td colspan="7" style="text-align: center">Data tidak ditemukan</td>
+                            </tr>   
+                        `
+                    }
+                    document.getElementById('medicines').innerHTML = bucket;
+                })
+                .catch((error) => {
+                    let bucket = `
+                <tr>
+                <td colspan="7" style="text-align: center">${error.message}</td>
+                </tr>   
+            `
+                    document.getElementById('medicines').innerHTML = bucket;
+                });
+        };
+        getMedicine();
+
+        // HAPUS DATA
+        const deleteData = async (id, nama_obat) => {
+            let nama_obatForm = document.getElementById("nama_obat").value;
+            let text = `Betul data ${nama_obat} akan dihapus?`;
+            if (confirm(text) == true) {
+                await axios.delete(`http://103.163.110.11:3031/medicines/${id}`, {
+                    nama_obat: nama_obatForm
+                })
+                    .then((response) => {
+                        alert("Data berhasil dihapus");
+                        console.log(response);
+                        getMedicine();
+                    })
+                    .catch((error) => {
+                        console.log(error.message);
+                    });
+            }
+        };
+
+
+        //SIMPAN DATA
+        const saveData = async () => {
+            let nama_obatForm = document.getElementById("nama_obat").value;
+            let jenis_obatForm = document.getElementById("jenis_obat").value;
+            let produsenForm = document.getElementById("produsen").value;
+            let hargaForm = document.getElementById("harga").value;
+            let stokForm = document.getElementById("stok").value;
+            await axios.post(`http://103.163.110.11:3031/medicines`, {
+                nama_obat: nama_obatForm,
+                jenis_obat: jenis_obatForm,
+                produsen: produsenForm,
+                harga: hargaForm,
+                stok: stokForm
+            })
+                .then((response) => {
+                    alert("Data berhasil ditambahkan");
+                    console.log(response);
+                    getMedicine();
+                })
+                .catch((error) => {
+                    console.log(error.message)
+                });
+        }
+
+
+        // UBAH DATA
+        const editData = (id, nama_obat, jenis_obat, produsen, harga, stok) => {
+            document.getElementById("nama_obat").value = nama_obat;
+            document.getElementById("jenis_obat").value = jenis_obat;
+            document.getElementById("produsen").value = produsen;
+            document.getElementById("harga").value = harga;
+            document.getElementById("stok").value = stok;
+            document.getElementById("button").innerText = "Ubah";
+            document
+                .getElementById("button")
+                .setAttribute("onclick", `updateData(${id})`);
+        };
+
+
+
+        const updateData = async (id, nama_obat) => {
+            let nama_obatForm = document.getElementById("nama_obat").value;
+            let jenis_obatForm = document.getElementById("jenis_obat").value;
+            let produsenForm = document.getElementById("produsen").value;
+            let hargaForm = document.getElementById("harga").value;
+            let stokForm = document.getElementById("stok").value;
+            let text = `Betul data akan diubah?`;
+            if (confirm(text) == true) {
+                await axios.patch(`http://103.163.110.11:3031/medicines/${id}`, {
+                    nama_obat: nama_obatForm,
+                    jenis_obat: jenis_obatForm,
+                    produsen: produsenForm,
+                    harga: hargaForm,
+                    stok: stokForm,
+                })
+                    .then((response) => {
+                        alert("Data berhasil diubah");
+                        console.log(response);
+                        getMedicine();
+
+                        document.getElementById("nama_obat").value = "";
+                        document.getElementById("jenis_obat").value = "";
+                        document.getElementById("produsen").value = "";
+                        document.getElementById("harga").value = "";
+                        document.getElementById("stok").value = "";
+                    })
+                    .catch((error) => {
+                        console.log(error.message);
+                    });
+            }
+        };
+
+
+
+    </script>
+</body>
+
+</html>
