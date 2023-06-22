@@ -6,8 +6,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Obat</title>
-    <!-- Bootstrap 5 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+    <link rel="shortcut icon" href="img/3.png">
     <style>
         body {
             background-color: aquamarine;
@@ -20,15 +21,16 @@
 
         h1 {
             color: white;
-            text-align: center;
+            text-align: left;
         }
 
 
         .container {
-            margin-top: 20px;
+            margin-top: 40px;
             border: 1px solid #000;
             border-radius: 10px;
             padding: 20px;
+
         }
 
         table {
@@ -43,27 +45,20 @@
         .edit,
         .delete {
             padding: 5px 10px;
-            margin-right: 5px;
             border-radius: 5px;
             cursor: pointer;
         }
 
         .edit {
-            background-color: #ffc107;
-            color: #000;
+            color: #ffffff;
             border: none;
         }
 
         .delete {
-            background-color: #dc3545;
             color: #fff;
             border: none;
         }
 
-        .edit:hover,
-        .delete:hover {
-            opacity: 0.8;
-        }
 
         .marquee {
             background-color: aliceblue;
@@ -77,18 +72,51 @@
             margin-top: 10px;
             margin-bottom: 0;
         }
+
+        .img {
+            padding-bottom: -20;
+
+        }
+
+        header {
+            display: flex;
+
+
+            align-items: center;
+
+
+            justify-content: space-between;
+        }
+
+        .obat {
+            display: flex;
+        }
+
+        .obat img {
+            width: 70px;
+            height: 70px;
+            margin-top: 30px;
+        }
+
+        header img {
+            width: 80px;
+            height: 80px;
+        }
     </style>
 </head>
 
 <body>
     <header>
-        <h1>Data Obat</h1>
+        <h1>🏥 DATA OBAT</h1>
+        <p>
+            <img src="img/4.gif" alt="">
+        </p>
     </header>
     <marquee class="marquee bg-primary-subtle" behavior="scroll" direction="left">Selamat Datang || Fitran Iman Ramadhan
         || MI21B</marquee>
     <div class="container">
-        <div class="kln">
-            <h3 class="text-bold">Berikut adalah daftar obat :</h3>
+        <div class="input">
+            <h3 class="text-bold">Isi Form disini :</h3>
             <div class="mb-3 mt-4">
                 <label for="nama_obat" class="form-label">Nama Obat</label>
                 <input id="nama_obat" type="text" class="form-control" placeholder="Isi nama obat disini">
@@ -106,23 +134,39 @@
                 <input id="stok" type="number" class="form-control" placeholder="Isi stok disini">
 
                 <div class="d-grid gap-2">
-                    <button class="btn btn-success mt-2" id="button" onclick="saveData()">Simpan</button>
+                    <button class="btn btn-success mt-2" id="button" onclick="saveData()">
+                        <i class="fas fa-plus"></i> Add
+                    </button>
                 </div>
-            </div>
+                <div class="d-flex justify-content-between">
+                    <div class="obat">
+                        <p>
+                            <img src="img/7.gif" alt="">
+                        </p>
+                        <h3 class="text-bold mt-5">Daftar Obat :</h3>
+                    </div>
 
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th class="bg-info">No</th>
-                        <th class="bg-info">Nama Obat</th>
-                        <th class="bg-info">Jenis Obat</th>
-                        <th class="bg-info">Produsen</th>
-                        <th class="bg-info">Harga</th>
-                        <th class="bg-info">Stok</th>
-                        <th colspan="2" class="bg-info">Action</th </tr>
-                </thead>
-                <tbody id="medicines"></tbody>
-            </table>
+                    <div class="align-items-end">
+                        <label for="search" class="form-label mt-3">Cari Nama Obat</label>
+                        <input id="search" type="text" oninput="searchMedicine()" class="form-control"
+                            placeholder="Search">
+                    </div>
+                </div>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th class="bg-info">No</th>
+                            <th class="bg-info">Nama Obat</th>
+                            <th class="bg-info">Jenis Obat</th>
+                            <th class="bg-info">Produsen</th>
+                            <th class="bg-info">Harga</th>
+                            <th class="bg-info">Stok</th>
+                            <th colspan="2" class="bg-info">Action</th </tr>
+                    </thead>
+                    <tbody id="medicines"></tbody>
+                </table>
+            </div>
         </div>
     </div>
     <footer>
@@ -133,7 +177,23 @@
 
     <!-- Axios Library -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js"></script>
     <script>
+
+        // Search
+        const searchMedicine = () => {
+            const searchInput = document.getElementById("search").value.toLowerCase();
+            const medicineRows = document.querySelectorAll("#medicines tr");
+
+            medicineRows.forEach((row) => {
+                const medicineName = row.querySelector("td:nth-child(2)").textContent.toLowerCase();
+                if (medicineName.includes(searchInput)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        };
 
 
         //TAMPIL DATA
@@ -148,18 +208,21 @@
                             bucket += `
                             <tr>
                             <td>${i + 1}</td>
-                            <td>${medicines[i].nama_obat}</td>
-                            <td>${medicines[i].jenis_obat}</td>
-                            <td>${medicines[i].produsen}</td>
+                            <td class="text-start">${medicines[i].nama_obat}</td>
+                            <td class="text-start">${medicines[i].jenis_obat}</td>
+                            <td class="text-start">${medicines[i].produsen}</td>
                             <td>${medicines[i].harga}</td>
                             <td>${medicines[i].stok}</td>
                             <td>
-                                <button class="edit" onclick="editData('${medicines[i].id}', '${medicines[i].nama_obat}', '${medicines[i].jenis_obat}', '${medicines[i].produsen}', '${medicines[i].harga}',
-                                 '${medicines[i].stok}')">Edit</button>
-                                </td>
+                                 <button class="edit bg-warning" onclick="editData('${medicines[i].id}', '${medicines[i].nama_obat}', '${medicines[i].jenis_obat}', '${medicines[i].produsen}', '${medicines[i].harga}', '${medicines[i].stok}')">
+                                <i class="fas fa-edit"></i> Edit
+                                 </button>
+                            </td>
                             <td>
-                                <button class="delete" onclick="deleteData(${medicines[i].id})">Delete</button>
-                                </td>
+                                <button class="delete bg-danger" onclick="deleteData(${medicines[i].id})">
+                                <i class="fas fa-trash-alt"></i> Delete
+                                </button>
+                        </td>
                             </tr>
                             `
                         }
@@ -184,9 +247,9 @@
         getMedicine();
 
         // HAPUS DATA
-        const deleteData = async (id, nama_obat) => {
+        const deleteData = async (id) => {
             let nama_obatForm = document.getElementById("nama_obat").value;
-            let text = `Betul data ${nama_obat} akan dihapus?`;
+            let text = `Betul data akan dihapus?`;
             if (confirm(text) == true) {
                 await axios.delete(`http://103.163.110.11:3031/medicines/${id}`, {
                     nama_obat: nama_obatForm
@@ -210,22 +273,29 @@
             let produsenForm = document.getElementById("produsen").value;
             let hargaForm = document.getElementById("harga").value;
             let stokForm = document.getElementById("stok").value;
-            await axios.post(`http://103.163.110.11:3031/medicines`, {
-                nama_obat: nama_obatForm,
-                jenis_obat: jenis_obatForm,
-                produsen: produsenForm,
-                harga: hargaForm,
-                stok: stokForm
-            })
+            await axios
+                .post(`http://103.163.110.11:3031/medicines`, {
+                    nama_obat: nama_obatForm,
+                    jenis_obat: jenis_obatForm,
+                    produsen: produsenForm,
+                    harga: hargaForm,
+                    stok: stokForm,
+                })
                 .then((response) => {
                     alert("Data berhasil ditambahkan");
                     console.log(response);
                     getMedicine();
+                    document.getElementById("nama_obat").value = "";
+                    document.getElementById("jenis_obat").value = "";
+                    document.getElementById("produsen").value = "";
+                    document.getElementById("harga").value = "";
+                    document.getElementById("stok").value = "";
                 })
                 .catch((error) => {
-                    console.log(error.message)
+                    console.log(error.message);
                 });
-        }
+        };
+
 
 
         // UBAH DATA
@@ -235,10 +305,9 @@
             document.getElementById("produsen").value = produsen;
             document.getElementById("harga").value = harga;
             document.getElementById("stok").value = stok;
-            document.getElementById("button").innerText = "Ubah";
-            document
-                .getElementById("button")
-                .setAttribute("onclick", `updateData(${id})`);
+            document.getElementById("button").classList.add("btn-warning", "text-white");
+            document.getElementById("button").innerHTML = '<i class="fas fa-edit"></i> Ubah';
+            document.getElementById("button").setAttribute("onclick", `updateData(${id})`);
         };
 
 
@@ -262,6 +331,8 @@
                         alert("Data berhasil diubah");
                         console.log(response);
                         getMedicine();
+                        resetButton();
+                        getMedicine();
 
                         document.getElementById("nama_obat").value = "";
                         document.getElementById("jenis_obat").value = "";
@@ -274,6 +345,16 @@
                     });
             }
         };
+
+        const resetButton = () => {
+            document.getElementById("button").classList.remove("btn-warning", "text-white");
+            document.getElementById("button").classList.add("btn-success");
+            document.getElementById("button").innerHTML = '<i class="fas fa-plus"></i> Simpan';
+            document.getElementById("button").removeAttribute("onclick");
+            document.getElementById("button").setAttribute("onclick", "saveData()");
+        };
+
+
 
 
 
